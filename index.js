@@ -81,8 +81,9 @@ const BinaryExpressionNode = (operation, arg1, arg2) => LangNode(
   () => `${operation}, ${arg1.print()}, ${arg2.print()}`,
 )
 
-const lexer = (line, lineNumber) => {
-  const tokens = line.split(/\s+/)
+const lexer = (line) => line.split(/\s+/)
+
+const parseExpression = (tokens, lineNumber) => {
 
   // If there are no tokens, it's a null line
   if (
@@ -191,17 +192,23 @@ const lexer = (line, lineNumber) => {
   return stack.pop()
 }
 
-const parser = (file) => {
-  // Our file stack will be an array of Tokens
-  const stack = file.split('\n')
+const compile = (file) =>
+  file.split('\n')
     .map((line, index) =>
-      lexer(line.trim(), index + 1)
+      parseExpression(
+        lexer(line.trim()),
+        index + 1
+      )
     )
-  return stack.map(node => {
-    console.log(node.value())
+
+const execute = (stack) =>
+  stack.map(node =>
     node.value()
-  })
-}
+  )
+
+const run = (file) =>
+  execute(compile(file))
+    .map(v => console.log(v))
 
 // Expected output:
 /*
@@ -216,7 +223,7 @@ const parser = (file) => {
   Invalid token: expected number literal, got '+'
   null
 */
-parser(`
+run(`
 1
 1 + 2 * 3
 2 + 3
