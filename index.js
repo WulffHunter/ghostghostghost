@@ -14,10 +14,11 @@ const COMPILER_ERRORS = {
  * @param {string} expected The expression the compiler was expecting
  * @param {string} token The token that caused the compiler error
  * @param {number} lineNumber The line number on which the error occurred
+ * @param {number} id An id to identify which error is being thrown
  */
-const CompilerError = (error, expected, token, lineNumber) => {
+const CompilerError = (error, expected, token, lineNumber, id) => {
   const generateError = () =>
-    `[COMPILATION ERROR]: ${error} => expected ${expected}, got '${token}' on line ${lineNumber}`
+    `[COMPILATION ERROR]: ${error} => expected ${expected}, got '${token}' on line ${lineNumber} (err:${id})`
   return {
     type: 'ERROR',
     value: generateError,
@@ -111,6 +112,7 @@ const parseExpression = (tokens, lineNumber) => {
           'a number literal',
           token,
           lineNumber,
+          0,
         )
       }
     } else {
@@ -136,6 +138,7 @@ const parseExpression = (tokens, lineNumber) => {
               'an operation token',
               token,
               lineNumber,
+              1,
             )
           } else {
             // Remove the next token from the list of tokens to
@@ -149,6 +152,7 @@ const parseExpression = (tokens, lineNumber) => {
                 'a number literal',
                 nextToken,
                 lineNumber,
+                2,
               )
             } else if (!NUMBER_REGEX.test(nextToken)) {
               // If the next token is not a regex, throw a compiler error
@@ -157,6 +161,7 @@ const parseExpression = (tokens, lineNumber) => {
                 'a number literal',
                 nextToken,
                 lineNumber,
+                3,
               )
             } else {
               stack.push(BinaryExpressionNode(
@@ -172,6 +177,7 @@ const parseExpression = (tokens, lineNumber) => {
             'a number or an operation',
             prevNode.type,
             lineNumber,
+            4,
           )
         }
       }
@@ -186,6 +192,7 @@ const parseExpression = (tokens, lineNumber) => {
       'a single token',
       stack.toString(),
       lineNumber,
+      5,
     )
   }
 
